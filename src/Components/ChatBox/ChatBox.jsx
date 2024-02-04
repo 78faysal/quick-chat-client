@@ -1,24 +1,68 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoMdSend } from "react-icons/io";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useAuth from "../../hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { useLoaderData, useParams } from "react-router-dom";
 
 const ChatBox = () => {
+  const friendInfo = useLoaderData();
+  const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  // console.log(messages);
+  const axiosSecure = useAxiosSecure();
 
-  const handleMessageSend = () => {
-    const messageInfo = {
-      message: message,
-      // sendar
+  const {
+    data: allMessages,
+    isPending,
+    refetch,
+  } = useQuery({
+    queryKey: ["messages", friendInfo?.email],
+    queryFn: async () => {
+      const { data } = await axiosSecure.get(
+        `/chats?from=${user.email}&to=${friendInfo.email}`
+      );
+      // console.log(data);
+      return data;
+    },
+  });
+
+  const { name, photo } = friendInfo;
+
+  useEffect(() => {
+    refetch();
+  }, [friendInfo, refetch]);
+
+  // console.log(allMessages);
+  // console.log(friendInfo.email);
+
+  const handleMessageSend = async () => {
+    // const messageInfo = {
+    //   message: message,
+    //   // sendar
+    // };
+    const messageData = {
+      from: user?.email,
+      to: friendInfo?.email,
+      content: message,
     };
-    console.log(message);
+
+    const { data } = await axiosSecure.post("/chats", messageData);
+    if (data.insertedId) {
+      refetch();
+      setMessage("");
+    }
   };
+
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
   return (
-    <div className=" w-[90%] h-full rounded-xl flex flex-col justify-between">
-      <div className="navbar bg-base-100 rounded-xl p-5">
-        <div className="flex-1">
-          <a className="btn btn-ghost text-xl"> </a>
-        </div>
+    <div className=" w-[90%] h-full rounded-xl relative flex flex-col bg-white justify-between">
+      {/* <div className="h-24 w-full pb-4"></div> */}
+      <div className="navbar bg-base-100 rounded-xl  p-5">
+        <div className="flex-1"></div>
         <div className="flex-none gap-2">
           <div className="form-control"></div>
           <div className="dropdown dropdown-end">
@@ -28,10 +72,7 @@ const ChatBox = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
-                <img
-                  alt=""
-                  src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                />
+                <img alt="" src={photo} />
               </div>
             </div>
             <ul
@@ -39,10 +80,7 @@ const ChatBox = () => {
               className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
             >
               <li>
-                <a className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </a>
+                <span className="justify-between">{name}</span>
               </li>
               <li>
                 <a>Settings</a>
@@ -55,20 +93,38 @@ const ChatBox = () => {
         </div>
       </div>
 
-      <div className="h-full">
-        <div className="chat chat-start">
-          <div className="chat-bubble bg-base-300 text-black ">
-            It is over Anakin, I have the high ground
+      <div className="h-full bg-white z-0">
+        {isPending && (
+          <div className="h-full w-full flex justify-center items-center">
+            <span className="loading loading-spinner loading-md"></span>
           </div>
-        </div>
-        <div className="chat chat-end">
-          <div className="chat-bubble  bg-base-300 text-black ">You underestimate my power!</div>
-        </div>
+        )}
+        {allMessages &&
+          allMessages?.map((message) => {
+            if (message?.from == user?.email) {
+              return (
+                <div key={message?._id} className="chat chat-end mb-2">
+                  <div className="chat-bubble  bg-base-300 text-black ">
+                    {message?.content}
+                  </div>
+                </div>
+              );
+            } else if (message?.from == friendInfo?.email) {
+              return (
+                <div key={message?._id} className="chat chat-start mb-2">
+                  <div className="chat-bubble bg-base-300 text-black ">
+                    {message?.content}
+                  </div>
+                </div>
+              );
+            }
+          })}
       </div>
 
-      <div className="join w-full relative p-6">
+      <div className="join w-full bottom-0 lg:w-[50%] max-sm:left-0 max-md:left-0 bg-white fixed z-10 p-6 pb-10">
         <input
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleMessageChange}
+          value={message}
           type="text"
           name="message"
           placeholder="Send Message"
@@ -81,6 +137,7 @@ const ChatBox = () => {
           <IoMdSend className="text-2xl" />
         </button>
       </div>
+      <div className="h-24"></div>
     </div>
   );
 };

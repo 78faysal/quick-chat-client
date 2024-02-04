@@ -5,6 +5,7 @@ const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
+  console.log(loading);
   if (loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">

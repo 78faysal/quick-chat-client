@@ -53,8 +53,8 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
       console.log("ovserbing user of", currentUser);
+      setLoading(false);
     });
   }, []);
 
