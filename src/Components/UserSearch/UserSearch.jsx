@@ -81,6 +81,11 @@ const UserSearch = () => {
                 Friend Requests
               </Link>
             </li>
+            <li>
+              <Link to={"/all-friends"} className="justify-between">
+                All Friends
+              </Link>
+            </li>
             <li onClick={handleLogOut}>
               <p>Logout</p>
             </li>

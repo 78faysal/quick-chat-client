@@ -1,6 +1,4 @@
 import { useState } from "react";
-import ChatBox from "../Components/ChatBox/ChatBox";
-// import Navbar from "../Components/Navbar/Navbar";
 import UsersBox from "../Components/UsersBox/UsersBox";
 import Profile from "../Components/Profile/Profile";
 import { Outlet, useLocation } from "react-router-dom";
@@ -9,7 +7,6 @@ import { CgMenuLeft } from "react-icons/cg";
 
 const HomeLayout = () => {
   const [friendInfo, setFriendInfo] = useState({});
-  const [lastMessage, setLastMessage] = useState("");
 
   const location = useLocation();
   // console.log(location);
@@ -31,18 +28,13 @@ const HomeLayout = () => {
             <UsersBox handleFriendSelect={handleFriendSelect} />
           </ul>
         </div>
-        <div className="drawer-content bg-base-100  flex flex-col items-center h-full justify-center">
+        <div className="drawer-content bg-base-100 flex flex-col items-center h-full p-5">
           <label
             htmlFor="my-drawer-2"
-            className="drawer-button left-5 lg:hidden mt-4"
+            className="drawer-button lg:hidden mt-4"
           >
-            <CgMenuLeft className="text-2xl fixed left-0 bg-white " />
+            <CgMenuLeft className="text-2xl fixed left-5 z-10 bg-white " />
           </label>
-          {/* {friendInfo?.email ? (
-            <ChatBox setLastMessage={setLastMessage} friendInfo={friendInfo} />
-          ) : (
-            <Profile />
-          )} */}
           {
             location?.pathname === '/' && <Profile />
           }

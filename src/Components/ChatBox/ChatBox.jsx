@@ -3,15 +3,27 @@ import { IoMdSend } from "react-icons/io";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { useLoaderData, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const ChatBox = () => {
-  const friendInfo = useLoaderData();
+  const {id} = useParams();
+  // const friendInfo = useLoaderData();
   const { user } = useAuth();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
   const axiosSecure = useAxiosSecure();
 
+  // frined info
+  const {data: friendInfo = [], isPending: friendInfoPending, refetch: friendInfoRefetch} = useQuery({
+    queryKey: ['friendInfo', id],
+    queryFn: async() => {
+      const {data} = await axiosSecure.get(`/get-user-by/${id}`);
+      // console.log(data);
+      return data;
+    }
+  })
+
+  // messages
   const {
     data: allMessages,
     isPending,
@@ -20,27 +32,24 @@ const ChatBox = () => {
     queryKey: ["messages", friendInfo?.email],
     queryFn: async () => {
       const { data } = await axiosSecure.get(
-        `/chats?from=${user.email}&to=${friendInfo.email}`
+        `/chats?from=${user.email}&to=${friendInfo?.email}`
       );
       // console.log(data);
       return data;
     },
   });
 
-  const { name, photo } = friendInfo;
+  // console.log(friendInfo);
+
+  const { name, photo, email, friends } = friendInfo;
+  // console.log(friendInfoPending);
 
   useEffect(() => {
     refetch();
   }, [friendInfo, refetch]);
 
-  // console.log(allMessages);
-  // console.log(friendInfo.email);
 
   const handleMessageSend = async () => {
-    // const messageInfo = {
-    //   message: message,
-    //   // sendar
-    // };
     const messageData = {
       from: user?.email,
       to: friendInfo?.email,
@@ -56,6 +65,28 @@ const ChatBox = () => {
 
   const handleMessageChange = (e) => {
     setMessage(e.target.value);
+  };
+
+  const handleBlock = async (status, email) => {
+    console.log('clicked', status);
+    const { data } = await axiosSecure.patch(`/user/status`, {
+      currentEmail: user?.email,
+      targetedEmail: email,
+      status,
+    });
+    // console.log("data of", data);
+    if (
+      data.updateCurrentUserStatus.modifiedCount > 0 &&
+      data.updateTargetedUserStatus.modifiedCount > 0
+    ) {
+      friendInfoRefetch();
+      if(status === 'block'){
+        toast.success(`Blocked ${name}`);
+      }
+      else{
+        toast.success(`Unblocked ${name}`);
+      }
+    }
   };
 
   return (
@@ -83,10 +114,18 @@ const ChatBox = () => {
                 <span className="justify-between">{name}</span>
               </li>
               <li>
-                <a>Settings</a>
-              </li>
-              <li>
-                <a>Logout</a>
+                {friends?.map((friend) => (
+                  <p className="block" key={friend._id}>
+                    {(friend.status === "block" && (
+                      <p onClick={() => handleBlock("confirm", email)}>
+                        Unblock
+                      </p>
+                    )) ||
+                      (friend.status === "confirm" && (
+                        <p onClick={() => handleBlock("block", email)}>Block</p>
+                      ))}
+                  </p>
+                ))}
               </li>
             </ul>
           </div>
@@ -94,7 +133,7 @@ const ChatBox = () => {
       </div>
 
       <div className="h-full bg-white z-0">
-        {isPending && (
+        {isPending || friendInfoPending && (
           <div className="h-full w-full flex justify-center items-center">
             <span className="loading loading-spinner loading-md"></span>
           </div>
@@ -121,23 +160,39 @@ const ChatBox = () => {
           })}
       </div>
 
-      <div className="join w-full bottom-0 lg:w-[50%] max-sm:left-0 max-md:left-0 bg-white fixed z-10 p-6 pb-10">
-        <input
-          onChange={handleMessageChange}
-          value={message}
-          type="text"
-          name="message"
-          placeholder="Send Message"
-          className="input input-bordered join-item w-full pr-10"
-        />
-        <button
-          onClick={handleMessageSend}
-          className="join-item absolute right-0 mr-6 p-3"
-        >
-          <IoMdSend className="text-2xl" />
-        </button>
-      </div>
-      <div className="h-24"></div>
+      {friends?.map((friend) => (
+        <span key={friend._id}>
+          {(friend.status === "block" && (
+            <>
+              <div className="join w-full bottom-0 lg:w-[45%] text-center max-sm:left-0 max-md:left-0 bg-white fixed z-10 p-6 pb-10">
+                <h2 className="text-xl font-semibold ">This user is blocked</h2>
+              </div>
+              <div className="h-24"></div>
+            </>
+          )) ||
+            (friend.status === "confirm" && (
+              <>
+                <div className="join w-full bottom-0 lg:w-[45%] max-sm:left-0 max-md:left-0 bg-white fixed z-10 p-6 pb-10">
+                  <input
+                    onChange={handleMessageChange}
+                    value={message}
+                    type="text"
+                    name="message"
+                    placeholder="Send Message"
+                    className="input input-bordered join-item w-full pr-10"
+                  />
+                  <button
+                    onClick={handleMessageSend}
+                    className="join-item absolute right-0 mr-6 p-3"
+                  >
+                    <IoMdSend className="text-2xl" />
+                  </button>
+                </div>
+                <div className="h-24"></div>
+              </>
+            ))}
+        </span>
+      ))}
     </div>
   );
 };

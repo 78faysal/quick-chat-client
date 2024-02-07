@@ -1,21 +1,20 @@
 import { Link } from "react-router-dom";
 
-const UserItemBox = ({ friendInfo, handleFriendSelect }) => {
+const UserItemBox = ({ friendInfo,  message, idx }) => {
   const { name, photo, _id } = friendInfo;
-  // console.log(friendInfo);
+  // console.log(idx);
   return (
-      <Link className="bg-base-200 py-3 mb-3" to={`/chats/${_id}`}>
-        <div
-        onClick={() => handleFriendSelect(friendInfo)}
+    <Link className="bg-base-200 py-3 mb-3" to={`/chats/${_id}`}>
+      <div
         className="flex gap-2"
       >
         <img className="w-12 h-12 rounded-full" src={photo} alt="" />
         <div>
           <h2 className="text-lg mb-0 font-semibold">{name}</h2>
-          <p>Message:</p>
+          <p>Message: {message[idx].slice(0, 6)}...</p>
         </div>
       </div>
-      </Link>
+    </Link>
   );
 };
 

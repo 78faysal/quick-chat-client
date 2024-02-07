@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Profile from "./Components/Profile/Profile.jsx";
 import ChatBox from "./Components/ChatBox/ChatBox.jsx";
 import AllRequests from "./Components/AllRequests/AllRequests.jsx";
+import AllFriends from "./Components/AllFriends/AllFriends.jsx";
 
 const router = createBrowserRouter([
   {
@@ -35,12 +36,16 @@ const router = createBrowserRouter([
           },
           {
             path: "chats/:id",
-            loader: ({params}) => fetch(`http://localhost:5000/users/${params.id}`),
+            // loader: ({params}) => fetch(`http://localhost:5000/users/${params.id}`),
             element: <ChatBox />,
           },
           {
             path: 'all-requests',
             element: <AllRequests />
+          },
+          {
+            path: 'all-friends',
+            element: <AllFriends />
           }
         ],
       },

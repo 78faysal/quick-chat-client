@@ -37,7 +37,7 @@ const AllRequests = () => {
         </div>
       )}
       {allRequests?.length < 1 && (
-        <h2 className="text-xl font-semibold text-center my-10">
+        <h2 className="text-xl font-semibold text-center">
           You have no requests
         </h2>
       )}
