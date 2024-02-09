@@ -3,7 +3,7 @@ import "./App.css";
 // import { useEffect, useState } from "react";
 
 
-// const socket = io('http://localhost:5000');
+// const socket = io('https://quick-chat-server.vercel.app');
 
 function App() {
   // const [messages, setMessages] = useState([]);

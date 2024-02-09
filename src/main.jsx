@@ -14,6 +14,7 @@ import Profile from "./Components/Profile/Profile.jsx";
 import ChatBox from "./Components/ChatBox/ChatBox.jsx";
 import AllRequests from "./Components/AllRequests/AllRequests.jsx";
 import AllFriends from "./Components/AllFriends/AllFriends.jsx";
+import UpdateProfile from "./Components/UpdateProfile/UpdateProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +37,7 @@ const router = createBrowserRouter([
           },
           {
             path: "chats/:id",
-            // loader: ({params}) => fetch(`http://localhost:5000/users/${params.id}`),
+            // loader: ({params}) => fetch(`https://quick-chat-server.vercel.app/users/${params.id}`),
             element: <ChatBox />,
           },
           {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
           {
             path: 'all-friends',
             element: <AllFriends />
+          },
+          {
+            path: 'update-profile/:id',
+            element: <UpdateProfile />
           }
         ],
       },

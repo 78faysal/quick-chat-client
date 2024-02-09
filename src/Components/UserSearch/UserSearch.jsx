@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
+import { RxCross2 } from "react-icons/rx";
 
 const UserSearch = () => {
   const { user, logOut, loading } = useAuth();
@@ -19,7 +20,7 @@ const UserSearch = () => {
       const { data } = await axiosSecure.get(
         `/users-by-name?name=${searchUser}`
       );
-        // console.log(data); 
+      // console.log(data);
       return data;
     },
   });
@@ -45,7 +46,8 @@ const UserSearch = () => {
       userInfo,
       currentEmail,
     });
-    if (data?.modifiedCount > 0) {
+    if (data?.requestSend === "successfull") {
+      toast.success("Request sended");
       setRequested(true);
     }
   };
@@ -109,7 +111,18 @@ const UserSearch = () => {
           </button>
         </form>
         {users && (
-          <div className="bg-white absolute z-10 left-0 py-3 w-full shadow-xl">
+          <div
+            id="all-users"
+            className="bg-white absolute z-10 left-0 py-3 w-full shadow-xl"
+          >
+            <span>
+              <RxCross2
+                onClick={() =>
+                  (document.getElementById("all-users").className = "hidden")
+                }
+                className="text-xl"
+              />
+            </span>
             {isPending && (
               <div className="h-full w-full flex justify-center items-center">
                 <span className="loading loading-spinner loading-md"></span>
@@ -136,6 +149,11 @@ const UserSearch = () => {
                 </button>
               </div>
             ))}
+            {users?.length < 1 && (
+              <div>
+                <p className="text-center">No users found</p>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -42,7 +42,7 @@ const ChatBox = () => {
   // console.log(friendInfo);
 
   const { name, photo, email, friends } = friendInfo;
-  // console.log(friendInfoPending);
+  // console.log(friends);
 
   useEffect(() => {
     refetch();
@@ -68,7 +68,7 @@ const ChatBox = () => {
   };
 
   const handleBlock = async (status, email) => {
-    console.log('clicked', status);
+    // console.log('clicked', status);
     const { data } = await axiosSecure.patch(`/user/status`, {
       currentEmail: user?.email,
       targetedEmail: email,
@@ -115,7 +115,7 @@ const ChatBox = () => {
               </li>
               <li>
                 {friends?.map((friend) => (
-                  <p className="block" key={friend._id}>
+                  <span className="block" key={friend._id}>
                     {(friend.status === "block" && (
                       <p onClick={() => handleBlock("confirm", email)}>
                         Unblock
@@ -124,7 +124,7 @@ const ChatBox = () => {
                       (friend.status === "confirm" && (
                         <p onClick={() => handleBlock("block", email)}>Block</p>
                       ))}
-                  </p>
+                  </span>
                 ))}
               </li>
             </ul>

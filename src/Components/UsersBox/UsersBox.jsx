@@ -7,16 +7,16 @@ import UserSearch from "../UserSearch/UserSearch";
 const UsersBox = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-  const { data: allFriends, isPending } = useQuery({
+  const { data: allFriends = [], isPending } = useQuery({
     queryKey: ["friends"],
     queryFn: async () => {
       const { data } = await axiosSecure.get(
         `/users/friends?email=${user?.email}&&message=${true}`
       );
-      // console.log(data.lastChats);
       return data;
     },
   });
+  // console.log(allFriends.lastChats);
 
   return (
     <div className="h-full">
@@ -27,9 +27,14 @@ const UsersBox = () => {
             <span className="loading loading-spinner loading-md"></span>
           </div>
         )}
-        {isPending || (
+        {allFriends?.friends < 1 && allFriends && (
+          <div>
+            <p className="text-center">Search user and connect with them</p>
+          </div>
+        )}
+        {!isPending && allFriends?.friends.length > 0 && (
           <li>
-            {allFriends?.friends.map((friend, idx) => (
+            {allFriends?.friends?.map((friend, idx) => (
               <UserItemBox
                 key={friend._id}
                 friendInfo={friend}
