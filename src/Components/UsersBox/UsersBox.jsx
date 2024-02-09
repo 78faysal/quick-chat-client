@@ -16,7 +16,7 @@ const UsersBox = () => {
       return data;
     },
   });
-  // console.log(allFriends.lastChats);
+  console.log(allFriends?.friends);
 
   return (
     <div className="h-full">
@@ -27,12 +27,12 @@ const UsersBox = () => {
             <span className="loading loading-spinner loading-md"></span>
           </div>
         )}
-        {allFriends?.friends < 1 && allFriends && (
+        { allFriends?.friends?.length < 1 || allFriends?.friends === undefined && (
           <div>
             <p className="text-center">Search user and connect with them</p>
           </div>
         )}
-        {!isPending && allFriends?.friends.length > 0 && (
+        {!isPending && allFriends?.friends?.length > 0 && (
           <li>
             {allFriends?.friends?.map((friend, idx) => (
               <UserItemBox

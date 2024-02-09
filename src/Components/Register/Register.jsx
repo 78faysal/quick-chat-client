@@ -8,7 +8,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useState } from "react";
 
 const Register = () => {
-  const { createUser, updateUser } = useAuth();
+  const { createUser, updateUser, setLoading } = useAuth();
   const [userLoading, setUserLoading] = useState(false);
   const navigate = useNavigate();
   const axiosSecure = useAxiosSecure();
@@ -53,6 +53,7 @@ const Register = () => {
                     form.reset();
                     setUserLoading(false);
                     toast.success("Account created👏");
+                    setLoading(false)
                   }
                 });
             })
